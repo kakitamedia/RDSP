@@ -162,4 +162,7 @@ cython_debug/
 /datasets/
 /wandb/
 /weights/
+/jupyter/
+.vscode
+.python-version
 
