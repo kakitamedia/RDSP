@@ -1,0 +1,13 @@
+SOLVER:
+  BATCH_SIZE: 6
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/centernet.py'
+    PRETRAINED_MODEL: 'weights/centernet_resnet18_dcnv2_140e_coco_20210702_155131-c8cd631f.pth'
+  SR:
+    FLAG: True
+    FACTOR: 4
+    PRETRAINED_MODEL: 'output/pretrain/bdd100k/sr/x4/model/iteration_500000.pth'
+  MASK:
+    FLAG: True
+    PRETRAINED_MODEL: 'output/pretrain/bdd100k/mask/x4/model/iteration_500000.pth'

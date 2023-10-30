@@ -1,0 +1,10 @@
+SOLVER:
+  BATCH_SIZE: 6
+MODEL:
+  SR:
+    FACTOR: 2
+  MASK:
+    ARCITECTURE: 'Flat'
+    CONTEXT:
+      FLAG: False
+    PRETRAINED_MODEL: ''

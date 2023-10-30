@@ -1,0 +1,14 @@
+SOLVER:
+  BATCH_SIZE: 6
+  BOX_THRESHOLD: 0.9
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/centernet_wo_dcn.py'
+    PRETRAINED_MODEL: 'weights/centernet_resnet18_140e_coco_20210705_093630-bb5b3bf7.pth'
+  SR:
+    FLAG: True
+    FACTOR: 4
+    PRETRAINED_MODEL: 'weights/dbpn_stage4_x4.pth'
+  MASK:
+    FLAG: False
+    PRETRAINED_MODEL: 'weights/mask_x4.pth'

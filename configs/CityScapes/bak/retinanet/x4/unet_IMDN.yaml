@@ -1,0 +1,15 @@
+SOLVER:
+  BATCH_SIZE: 6
+  BOX_THRESHOLD: 0.9
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/retinanet.py'
+    PRETRAINED_MODEL: 'weights/retinanet_r50_fpn_1x_coco_20200130-c2398f9e.pth'
+  SR:
+    FLAG: True
+    FACTOR: 4
+    ARCITECTURE: 'IMDN'
+    PRETRAINED_MODEL: 'weights/IMDN_x4.pth'
+  MASK:
+    FLAG: True
+    PRETRAINED_MODEL: 'weights/mask_x4.pth'

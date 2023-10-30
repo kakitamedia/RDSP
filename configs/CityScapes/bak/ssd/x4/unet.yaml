@@ -1,0 +1,6 @@
+SOLVER:
+  BOX_THRESHOLD: 0.9
+MODEL:
+
+DATA:
+  INPUT_STD: (1., 1., 1.)

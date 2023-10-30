@@ -1,0 +1,11 @@
+SOLVER:
+  BATCH_SIZE: 6
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/centernet_wo_dcn.py'
+    PRETRAINED_MODEL: 'weights/centernet_resnet18_140e_coco_20210705_093630-bb5b3bf7.pth'
+  SR:
+    FLAG: False
+    FACTOR: 1
+  MASK:
+    FLAG: False

@@ -1,0 +1,14 @@
+SOLVER:
+  BATCH_SIZE: 6
+  BOX_THRESHOLD: 0.9
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/ssd512.py'
+    PRETRAINED_MODEL: 'weights/ssd512_coco_20210803_022849-0a47a1ca.pth'
+  SR:
+    FLAG: True
+    FACTOR: 4
+    PRETRAINED_MODEL: 'weights/dbpn_stage4_x4.pth'
+  MASK:
+    FLAG: True
+    PRETRAINED_MODEL: 'weights/mask_x4.pth'

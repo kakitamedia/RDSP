@@ -1,0 +1,18 @@
+SOLVER:
+  BATCH_SIZE: 6
+  BOX_THRESHOLD: 0.9
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/ssd512.py'
+    PRETRAINED_MODEL: 'weights/ssd512_coco_20210803_022849-0a47a1ca.pth'
+  SR:
+    FLAG: True
+    FACTOR: 2
+    PRETRAINED_MODEL: 'weights/dbpn_stage4_x2.pth'
+  MASK:
+    ARCITECTURE: 'Flat'
+    CONTEXT:
+      FLAG: False
+    COOD:
+      FLAG: False
+    PRETRAINED_MODEL: 'output/CityScapes/pretrain/mask_flat_wo_pe_ce_x2/model/iteration_500000.pth'

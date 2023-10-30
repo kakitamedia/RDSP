@@ -1,0 +1,14 @@
+SOLVER:
+  BATCH_SIZE: 6
+  BOX_THRESHOLD: 0.9
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/fcos.py'
+    PRETRAINED_MODEL: 'weights/fcos_r50_caffe_fpn_gn-head_1x_coco-821213aa.pth'
+  SR:
+    FLAG: True
+    FACTOR: 4
+    PRETRAINED_MODEL: 'weights/dbpn_stage4_x4.pth'
+  MASK:
+    FLAG: False
+    PRETRAINED_MODEL: 'weights/mask_x4.pth'

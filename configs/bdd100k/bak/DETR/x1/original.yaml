@@ -1,0 +1,21 @@
+SOLVER:
+  BATCH_SIZE: 6
+  OPTIMIZER: 'Adam'
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/DETR.py'
+    PRETRAINED_MODEL: 'weights/detr_r50_8x2_150e_coco_20201130_194835-2c4b8974.pth'
+  SR:
+    FLAG: False
+    FACTOR: 1
+  MASK:
+    FLAG: False
+DATA:
+  TRAIN:
+    IMAGE_DIR: 'datasets/bdd100k/images/100k/train'
+    ANN_FILE: 'datasets/bdd100k/labels/det_20_coco/det_train.json'
+    MASK_DIR: 'datasets/bdd100k/mask_gts'
+  TEST:
+    IMAGE_DIR: 'datasets/bdd100k/images/100k/val'
+    ANN_FILE: 'datasets/bdd100k/labels/det_20_coco/det_val.json'
+    MASK_DIR: 'datasets/bdd100k/mask_gts'

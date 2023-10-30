@@ -1,0 +1,10 @@
+SOLVER:
+  BATCH_SIZE: 6
+MODEL:
+  SR:
+    FACTOR: 1
+  MASK:
+    ARCITECTURE: 'UNet'
+    CONTEXT:
+      FLAG: False
+    PRETRAINED_MODEL: ''

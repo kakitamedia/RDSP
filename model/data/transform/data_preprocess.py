@@ -6,7 +6,7 @@ class TrainTransforms:
             ConvertFromInts(),
             RandomMirror(),
             Clip(),
-            Normalize(cfg.SOLVER.INPUT_MEAN, cfg.SOLVER.INPUT_STD),
+            Normalize(cfg.DATA.INPUT_MEAN, cfg.DATA.INPUT_STD),
         ])
 
     def __call__(self, image, mask, boxes, labels):
@@ -19,7 +19,8 @@ class TestTransforms:
     def __init__(self, cfg):
         self.transforms = Compose([
             ConvertFromInts(),
-            Normalize(cfg.SOLVER.INPUT_MEAN, cfg.SOLVER.INPUT_STD),
+            # ZeroPadTo((768, 1280)),
+            Normalize(cfg.DATA.INPUT_MEAN, cfg.DATA.INPUT_STD),
         ])
 
     def __call__(self, image, mask, boxes, labels):

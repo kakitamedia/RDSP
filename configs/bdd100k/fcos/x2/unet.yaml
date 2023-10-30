@@ -1,0 +1,23 @@
+SOLVER:
+  BATCH_SIZE: 6
+  BOX_THRESHOLD: 0.9
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/fcos.py'
+    PRETRAINED_MODEL: 'weights/fcos_r50_caffe_fpn_gn-head_1x_coco-821213aa.pth'
+  SR:
+    FLAG: True
+    FACTOR: 2
+    PRETRAINED_MODEL: 'weights/dbpn_stage4_x2.pth'
+  MASK:
+    FLAG: True
+    PRETRAINED_MODEL: 'weights/mask_x2.pth'
+DATA:
+  TRAIN:
+    IMAGE_DIR: 'datasets/bdd100k/images/100k/train'
+    ANN_FILE: 'datasets/bdd100k/labels/det_20_coco/det_train.json'
+    MASK_DIR: 'datasets/bdd100k/mask_gts'
+  TEST:
+    IMAGE_DIR: 'datasets/bdd100k/images/100k/val'
+    ANN_FILE: 'datasets/bdd100k/labels/det_20_coco/det_val.json'
+    MASK_DIR: 'datasets/bdd100k/mask_gts'

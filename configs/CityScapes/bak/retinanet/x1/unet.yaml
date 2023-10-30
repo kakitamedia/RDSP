@@ -1,0 +1,12 @@
+SOLVER:
+  BATCH_SIZE: 6
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/retinanet.py'
+    PRETRAINED_MODEL: 'weights/retinanet_r50_fpn_1x_coco_20200130-c2398f9e.pth'
+  SR:
+    FLAG: False
+    FACTOR: 1
+  MASK:
+    FLAG: True
+    PRETRAINED_MODEL: 'weights/mask_x1.pth'

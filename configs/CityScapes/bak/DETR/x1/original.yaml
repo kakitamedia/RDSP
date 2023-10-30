@@ -1,0 +1,12 @@
+SOLVER:
+  BATCH_SIZE: 64
+  OPTIMIZER: 'AdamW'
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/DETR.py'
+    PRETRAINED_MODEL: 'weights/detr_r50_8x2_150e_coco_20201130_194835-2c4b8974.pth'
+  SR:
+    FLAG: False
+    FACTOR: 1
+  MASK:
+    FLAG: False

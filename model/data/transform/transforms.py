@@ -235,3 +235,13 @@ class Clip:
 
         return image, mask, boxes, labels
 
+class ZeroPadTo():
+    def __init__(self, size):
+        self.size = size
+
+    def __call__(self, image, mask=None, boxes=None, labels=None):
+        height, width, _ = image.shape
+        pad_size = ((0, self.size[0] - height), (0, self.size[1] - width), (0, 0))
+        image = np.pad(image, pad_size)
+
+        return image, mask, boxes, labels

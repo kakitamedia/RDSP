@@ -4,10 +4,17 @@ import torch.nn as nn
 from .base_networks import *
 
 def build_mask_model(cfg):
+    if not cfg.MODEL.MASK.FLAG:
+        return EmptyMaskModel()
+
     model = MaskWrapper(cfg)
     if cfg.MODEL.MASK.WEIGHT_FIX:
         for param in model.parameters():
             param.requires_grad = False
+
+    if cfg.MODEL.MASK.PRETRAINED_MODEL:
+        print(f'Pretrained mask model was loaded from {cfg.MODEL.MASK.PRETRAINED_MODEL}')
+        model.load_state_dict(torch.load(cfg.MODEL.MASK.PRETRAINED_MODEL))
 
     return model
 
@@ -22,32 +29,41 @@ class MaskWrapper(nn.Module):
         self.activation = cfg.MODEL.ACTIVATION
         self.normalization = cfg.MODEL.NORMALIZATION
 
-        self.init_layer = ConvBlock(input_channel, self.feat, bias=self.bias, activation=self.activation, normalization=self.normalization)
-        self.output_layer = ConvBlock(self.feat, 1, bias=self.bias, activation='sigmoid', normalization=self.normalization)
-        self.layers = UNetBlock(self.feat, down_scale=5, num_convs=3, bias=self.bias, activation=self.activation, normalization=self.normalization)
+        self.init_layers = ConvBlock(input_channel, self.feat, bias=self.bias, activation=self.activation, normalization=self.normalization)
+        self.output_layers = ConvBlock(self.feat, 1, bias=self.bias, activation='sigmoid', normalization=self.normalization)
+        self.layers = self._make_main_layers(cfg)
 
-        self.cood_layer = self._make_cood_layers(cfg)
-        self.context_convs, self.context_fcs = self._make_context_layers(cfg)
+        self.cood_layers = self._make_cood_layers(cfg)
+        self.context_init, self.context_convs, self.context_fcs = self._make_context_layers(cfg)
+
+        self.cood_type = cfg.MODEL.MASK.COOD.MODE
+        self.context_type = cfg.MODEL.MASK.CONTEXT.MODE
 
     def forward(self, x, context=None, cood=None):
-        assert context is None == self.context_layer is None
-        assert cood is None == self.cood_layers is None
-
         x = self.init_layers(x)
-        if cood:
+        if self.cood_layers is not None:
             cood = self.cood_layers(cood)
-            x = x + cood
+            if self.cood_type == 'add':
+                x = x + cood
+            elif self.cood_type == 'mul':
+                x = x * cood
 
-        if context:
-            context = self.init_layers(context)
-            if cood:
-                context = self.cood_layer(self._make_context_cood(context))
-                context = context + cood
+        if self.context_convs is not None:
+            context = self.context_init(context)
+            if self.cood_layers is not None:
+                context_cood = self.cood_layers(self._make_context_cood(context))
+                if self.cood_type == 'add':
+                    context = context + context_cood
+                elif self.cood_type == 'mul':
+                    context = context * context_cood
 
             context = self.context_convs(context).squeeze(3).squeeze(2)
             context = self.context_fcs(context).unsqueeze(2).unsqueeze(3)
             context = context.expand(*x.shape)
-            x = x + context
+            if self.context_type == 'add':
+                x = x + context
+            elif self.context_type == 'mul':
+                x = x * context
 
         x = self.layers(x)
         x = self.output_layers(x)
@@ -77,7 +93,12 @@ class MaskWrapper(nn.Module):
 
     def _make_context_layers(self, cfg):
         if not cfg.MODEL.MASK.CONTEXT.FLAG:
-            return None
+            return None, None, None
+
+        init_conv = [
+            ConvBlock(3, self.feat, kernel_size=7, stride=2, padding=3, bias=self.bias, activation=self.activation, normalization=self.normalization),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        ]
 
         convs = []
         for _ in range(cfg.MODEL.MASK.CONTEXT.NUM_SCALES):
@@ -94,7 +115,14 @@ class MaskWrapper(nn.Module):
                 DenseBlock(self.feat, self.feat, bias=self.bias, activation=self.activation, normalization=self.normalization)
             )
 
-        return nn.Sequential(*convs), nn.Sequential(*fcs)
+        return nn.Sequential(*init_conv), nn.Sequential(*convs), nn.Sequential(*fcs)
+
+
+    def _make_main_layers(self, cfg):
+        if cfg.MODEL.MASK.ARCITECTURE == 'UNet':
+            return UNetBlock(self.feat, down_scale=5, num_convs=3, bias=self.bias, activation=self.activation, normalization=self.normalization)
+        elif cfg.MODEL.MASK.ARCITECTURE == 'Flat':
+            return FlatBlock(self.feat, down_scale=5, num_convs=3, bias=self.bias, activation=self.activation, normalization=self.normalization)
 
 
 class UNetBlock(nn.Module):
@@ -113,7 +141,7 @@ class UNetBlock(nn.Module):
             )
             for _ in range(num_convs-2):
                 self.conv_blocks.append(
-                    ConvBlock(base_filter, base_filter ,kernel_size=3, stride=1, padding=1, )
+                    ConvBlock(base_filter, base_filter, kernel_size=3, stride=1, padding=1, )
                 )
         self.conv_blocks = nn.ModuleList(self.conv_blocks)
 
@@ -145,3 +173,60 @@ class UNetBlock(nn.Module):
                 x = torch.cat((x, sources.pop(-1)), 1)
 
         return x
+
+
+class FlatBlock(nn.Module):
+    def __init__(self, base_filter=64, down_scale=3, num_convs=3, bias=True, activation='prelu', normalization=None):
+        super(FlatBlock, self).__init__()
+
+        self.num_convs = num_convs
+
+        self.conv_blocks = []
+        for _ in range(down_scale):
+            self.conv_blocks.append(
+                ConvBlock(base_filter, base_filter, kernel_size=3, stride=1, padding=1, activation=activation, normalization=normalization)
+            )
+            self.conv_blocks.append(
+                ConvBlock(base_filter, base_filter, kernel_size=3, stride=1, padding=1, activation=activation, normalization=normalization)
+            )
+            for _ in range(num_convs-2):
+                self.conv_blocks.append(
+                    ConvBlock(base_filter, base_filter, kernel_size=3, stride=1, padding=1, )
+                )
+        self.conv_blocks = nn.ModuleList(self.conv_blocks)
+
+        self.deconv_blocks = []
+        for _ in range(down_scale):
+            self.deconv_blocks.append(
+                DeconvBlock(base_filter, base_filter, kernel_size=3, stride=1, padding=1, activation=activation, normalization=normalization)
+            )
+            self.deconv_blocks.append(
+                ConvBlock(2 * base_filter, base_filter, kernel_size=3, stride=1, padding=1, activation=activation, normalization=normalization)
+            )
+            for _ in range(num_convs-2):
+                self.deconv_blocks.append(
+                    ConvBlock(base_filter, base_filter, kernel_size=3, stride=1, padding=1, activation=activation, normalization=normalization)
+                )
+        self.deconv_blocks = nn.ModuleList(self.deconv_blocks)
+
+
+    def forward(self, x):
+        sources = []
+        for i in range(len(self.conv_blocks)):
+            if i % self.num_convs == 0 and i != len(self.conv_blocks)-1 :
+                sources.append(x)
+            x = self.conv_blocks[i](x)
+
+        for i in range(len(self.deconv_blocks)):
+            x = self.deconv_blocks[i](x)
+            if i % self.num_convs == 0 and len(sources) != 0:
+                x = torch.cat((x, sources.pop(-1)), 1)
+
+        return x
+
+class EmptyMaskModel(nn.Module):
+    def __init__(self):
+        super(EmptyMaskModel, self).__init__()
+
+    def forward(self, x, context=None, cood=None):
+        return torch.ones_like(x)[:, 0:1, :, :]

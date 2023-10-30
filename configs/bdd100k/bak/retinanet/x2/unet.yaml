@@ -1,0 +1,13 @@
+SOLVER:
+  BATCH_SIZE: 6
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/retinanet.py'
+    PRETRAINED_MODEL: 'weights/retinanet_r50_fpn_1x_coco_20200130-c2398f9e.pth'
+  SR:
+    FLAG: True
+    FACTOR: 2
+    PRETRAINED_MODEL: 'output/pretrain/bdd100k/sr/x2/model/iteration_500000.pth'
+  MASK:
+    FLAG: True
+    PRETRAINED_MODEL: 'output/pretrain/bdd100k/mask/x2/model/iteration_500000.pth'

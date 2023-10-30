@@ -2,14 +2,32 @@ import torch
 import torch.nn as nn
 
 from .base_networks import *
+from .esrt import ESRT
+from .imdn import IMDN
 
 def build_sr_model(cfg):
-    model = globals()[cfg.MODEL.SR.ARCITECTURE](cfg.MODEL.SR.FACTOR)
+    if not cfg.MODEL.SR.FLAG:
+        return nn.Upsample(scale_factor=cfg.MODEL.SR.FACTOR, mode=cfg.MODEL.SR.INTERP_METHOD)
+
+    if cfg.MODEL.SR.ARCITECTURE == 'DBPN':
+        model = DBPN(scale_factor=cfg.MODEL.SR.FACTOR)
+    elif cfg.MODEL.SR.ARCITECTURE == 'DDBPN':
+        model = DDBPN(scale_factor=cfg.MODEL.SR.FACTOR)
+    elif cfg.MODEL.SR.ARCITECTURE == 'ESRT':
+        model = ESRT(upscale=cfg.MODEL.SR.FACTOR)
+    elif cfg.MODEL.SR.ARCITECTURE == 'IMDN':
+        model = IMDN(upscale=cfg.MODEL.SR.FACTOR)
+
     if cfg.MODEL.SR.WEIGHT_FIX:
         for param in model.paramters():
             param.requires_grad = False
 
+    if cfg.MODEL.SR.PRETRAINED_MODEL:
+        print(f'Pretrained SR model was loaded from {cfg.MODEL.SR.PRETRAINED_MODEL}')
+        model.load_state_dict(torch.load(cfg.MODEL.SR.PRETRAINED_MODEL))
+
     return model
+
 
 class DBPN(nn.Module):
     def __init__(self, scale_factor, num_stages=4, input_channels=3, num_channels=64, feat=256, bias=True, activation='prelu', normalization=None):

@@ -1,0 +1,12 @@
+SOLVER:
+  BATCH_SIZE: 6
+  OPTIMIZER: 'Adam'
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/Deformable_DETR.py'
+    PRETRAINED_MODEL: 'weights/deformable_detr_r50_16x2_50e_coco_20210419_220030-a12b9512.pth'
+  SR:
+    FLAG: False
+    FACTOR: 1
+  MASK:
+    FLAG: False

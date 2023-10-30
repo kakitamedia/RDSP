@@ -1,0 +1,11 @@
+SOLVER:
+  BATCH_SIZE: 6
+MODEL:
+  DETECTOR:
+    CONFIG_FILE: 'model/modeling/detector_configs/faster_rcnn.py'
+    PRETRAINED_MODEL: 'weights/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth'
+  SR:
+    FLAG: False
+    FACTOR: 1
+  MASK:
+    FLAG: False
