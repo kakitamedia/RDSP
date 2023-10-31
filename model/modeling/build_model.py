@@ -31,12 +31,6 @@ class Model(nn.Module):
         self.up = nn.Upsample(scale_factor=cfg.MODEL.SR.FACTOR)
 
 
-    # def forward(self, detect_input=None, mask_input=None, context_image=None, cood=None, targets=None):
-    #     x = {}
-    #     x['detect_input'] = detect_input
-    #     x['mask_input'] = mask_input
-    #     x['context_image'] = context_image
-    #     x['cood'] = cood
     def forward(self, x, targets=None):
         x = {k:v.to('cuda', non_blocking=True) for k, v in x.items()}
 
@@ -50,7 +44,6 @@ class Model(nn.Module):
 
             return sr, mask, det
 
-        # targets = {k:v.to('cuda', non_blocking=True) for k, v in targets.items()}
         loss, loss_dict = 0, {}
 
         det_loss = self.det_model(sr*mask, targets=targets['det'])
