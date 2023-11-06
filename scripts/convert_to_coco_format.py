@@ -17,8 +17,6 @@ def parse_args():
     return parser.parse_args()
 
 
-
-
 def main():
     args = parse_args()
 
