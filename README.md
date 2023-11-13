@@ -64,7 +64,13 @@ python shell/test.py
 ## Citation and License
 
 '''
-@article{
-
-}
+@ARTICLE{10304134,
+  author={Akita, Kazutoshi and Ukita, Norimichi},
+  journal={IEEE Access},
+  title={Context-Aware Region-Dependent Scale Proposals for Scale-Optimized Object Detection Using Super-Resolution},
+  year={2023},
+  volume={11},
+  number={},
+  pages={122141-122153},
+  doi={10.1109/ACCESS.2023.3329302}}
 '''
